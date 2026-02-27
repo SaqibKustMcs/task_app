@@ -64,6 +64,9 @@ export class Task {
   
 }
 
+
+
+
 export const TaskSchema = SchemaFactory.createForClass(Task);
 
 TaskSchema.set('timestamps', true);
