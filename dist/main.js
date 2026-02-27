@@ -32,7 +32,7 @@ async function bootstrap() {
     await app.listen(port);
     console.log(`\nPost API running at http://localhost:${port}`);
     console.log(`Swagger UI: http://localhost:${port}/swagger\n`);
-    console.log('\nMongo URI:', process.env.MONGO_URI || '');
+    console.log('\nMongo URI> changes: ', process.env.MONGO_URI || '');
 }
 bootstrap();
 //# sourceMappingURL=main.js.map

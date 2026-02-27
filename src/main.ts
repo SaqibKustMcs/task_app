@@ -41,7 +41,7 @@ async function bootstrap() {
   console.log(`\nPost API running at http://localhost:${port}`);
   console.log(`Swagger UI: http://localhost:${port}/swagger\n`);
   console.log(
-  '\nMongo URI:',
+  '\nMongo URI> changes: ', 
   process.env.MONGO_URI || '',
 );
 }
