@@ -1,0 +1,20 @@
+import { Request as ExpressRequest } from 'express';
+import { UserDocument } from '../schema/user/user.schema';
+import { AuthService } from './auth.service';
+import { SignupDto, SignupResponseDto, VerifyEmailDto, VerifyEmailResponseDto, LoginDto, LoginResponseDto, UserResponseDto } from './dto/signup.dto';
+export type AuthRequest = ExpressRequest & {
+    user: UserDocument;
+};
+export declare class AuthController {
+    private readonly authService;
+    constructor(authService: AuthService);
+    signup(dto: SignupDto): Promise<SignupResponseDto>;
+    verifyEmail(dto: VerifyEmailDto): Promise<VerifyEmailResponseDto>;
+    login(dto: LoginDto): Promise<LoginResponseDto>;
+    getLoggedInUser(req: AuthRequest): UserResponseDto;
+    getUsers(): Promise<{
+        id: string;
+        name: string;
+        email: string;
+    }[]>;
+}
