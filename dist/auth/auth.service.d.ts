@@ -1,7 +1,7 @@
 import { JwtService } from '@nestjs/jwt';
 import { Model } from 'mongoose';
 import { UserDocument } from '../schema/user/user.schema';
-import { SignupDto, SignupResponseDto, UserResponseDto, VerifyEmailDto, VerifyEmailResponseDto, LoginDto, LoginResponseDto } from './dto/signup.dto';
+import { SignupDto, SignupResponseDto, UserResponseDto, VerifyEmailDto, VerifyEmailResponseDto, LoginDto, LoginResponseDto, RegisterFcmDto } from './dto/signup.dto';
 export declare class AuthService {
     private readonly userModel;
     private readonly jwtService;
@@ -16,4 +16,8 @@ export declare class AuthService {
         name: string;
         email: string;
     }[]>;
+    registerFcm(userId: string, dto: RegisterFcmDto): Promise<{
+        success: boolean;
+        message: string;
+    }>;
 }

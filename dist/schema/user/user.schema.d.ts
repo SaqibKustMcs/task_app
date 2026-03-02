@@ -12,6 +12,12 @@ export declare class User {
     otpExpiresAt: Date | null;
     createdAt: Date;
     updatedAt: Date;
+    fcmTokens: {
+        token: string;
+        appId?: string | null;
+        deviceId?: string | null;
+        updatedAt: Date;
+    }[];
 }
 export declare const UserSchema: import("mongoose").Schema<User, import("mongoose").Model<User, any, any, any, import("mongoose").Document<unknown, any, User, any, {}> & User & {
     _id: import("mongoose").Types.ObjectId;

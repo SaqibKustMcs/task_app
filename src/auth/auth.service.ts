@@ -12,10 +12,25 @@ import {
   VerifyEmailResponseDto,
   LoginDto,
   LoginResponseDto,
+  RegisterFcmDto,
 } from './dto/signup.dto';
 
 const DEFAULT_OTP = '123456';
 const OTP_EXPIRY_MINUTES = 15;
+const MAX_FCM_TOKENS = 20;
+
+/** Upsert FCM token into user's list (by token string); cap at MAX_FCM_TOKENS. */
+function upsertFcmToken(
+  tokens: { token: string; appId?: string | null; deviceId?: string | null; updatedAt: Date }[],
+  token: string,
+  appId?: string | null,
+  deviceId?: string | null,
+): { token: string; appId?: string | null; deviceId?: string | null; updatedAt: Date }[] {
+  const next = { token, appId: appId ?? null, deviceId: deviceId ?? null, updatedAt: new Date() };
+  const filtered = tokens.filter((t) => t.token !== token);
+  const updated = [next, ...filtered].slice(0, MAX_FCM_TOKENS);
+  return updated;
+}
 
 @Injectable()
 export class AuthService {
@@ -60,6 +75,10 @@ export class AuthService {
       emailVerified: false,
       otp: DEFAULT_OTP,
       otpExpiresAt,
+      fcmTokens:
+        dto.fcmToken?.trim() ?
+          upsertFcmToken([], dto.fcmToken.trim(), dto.appId?.trim(), dto.deviceId?.trim())
+        : [],
     });
     return {
       id: user.id,
@@ -116,6 +135,17 @@ export class AuthService {
       throw new BadRequestException('Please verify your email before logging in');
     }
 
+    if (dto.fcmToken?.trim()) {
+      const tokens = (user as any).fcmTokens ?? [];
+      user.fcmTokens = upsertFcmToken(
+        tokens,
+        dto.fcmToken.trim(),
+        dto.appId?.trim(),
+        dto.deviceId?.trim(),
+      );
+      await user.save();
+    }
+
     return {
       success: true,
       message: 'Login successful',
@@ -132,5 +162,22 @@ export class AuthService {
       name: u.name ?? '',
       email: u.email ?? '',
     }));
+  }
+
+  /** Register or update FCM token for the current user (multiple devices/apps). */
+  async registerFcm(userId: string, dto: RegisterFcmDto): Promise<{ success: boolean; message: string }> {
+    const user = await this.userModel.findOne({ id: userId }).exec();
+    if (!user) {
+      throw new BadRequestException('User not found');
+    }
+    const tokens = (user as any).fcmTokens ?? [];
+    user.fcmTokens = upsertFcmToken(
+      tokens,
+      dto.fcmToken.trim(),
+      dto.appId?.trim(),
+      dto.deviceId?.trim(),
+    );
+    await user.save();
+    return { success: true, message: 'FCM token registered' };
   }
 }

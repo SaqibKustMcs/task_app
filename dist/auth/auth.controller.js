@@ -38,6 +38,9 @@ let AuthController = class AuthController {
     getUsers() {
         return this.authService.getUsers();
     }
+    registerFcm(req, dto) {
+        return this.authService.registerFcm(req.user.id, dto);
+    }
 };
 exports.AuthController = AuthController;
 __decorate([
@@ -97,6 +100,21 @@ __decorate([
     __metadata("design:paramtypes", []),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "getUsers", null);
+__decorate([
+    (0, common_1.Post)('fcm'),
+    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
+    (0, swagger_1.ApiBearerAuth)('access-token'),
+    (0, swagger_1.ApiOperation)({ summary: 'Register or refresh FCM token (multiple devices/apps)' }),
+    (0, swagger_1.ApiBody)({ type: signup_dto_1.RegisterFcmDto }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'FCM token registered' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
+    (0, swagger_1.ApiResponse)({ status: 400, description: 'Validation error' }),
+    __param(0, (0, common_1.Request)()),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, signup_dto_1.RegisterFcmDto]),
+    __metadata("design:returntype", void 0)
+], AuthController.prototype, "registerFcm", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
     (0, common_1.Controller)('auth'),

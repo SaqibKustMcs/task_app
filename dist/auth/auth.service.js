@@ -54,6 +54,13 @@ const bcrypt = __importStar(require("bcryptjs"));
 const user_schema_1 = require("../schema/user/user.schema");
 const DEFAULT_OTP = '123456';
 const OTP_EXPIRY_MINUTES = 15;
+const MAX_FCM_TOKENS = 20;
+function upsertFcmToken(tokens, token, appId, deviceId) {
+    const next = { token, appId: appId ?? null, deviceId: deviceId ?? null, updatedAt: new Date() };
+    const filtered = tokens.filter((t) => t.token !== token);
+    const updated = [next, ...filtered].slice(0, MAX_FCM_TOKENS);
+    return updated;
+}
 let AuthService = class AuthService {
     userModel;
     jwtService;
@@ -92,6 +99,9 @@ let AuthService = class AuthService {
             emailVerified: false,
             otp: DEFAULT_OTP,
             otpExpiresAt,
+            fcmTokens: dto.fcmToken?.trim() ?
+                upsertFcmToken([], dto.fcmToken.trim(), dto.appId?.trim(), dto.deviceId?.trim())
+                : [],
         });
         return {
             id: user.id,
@@ -143,6 +153,11 @@ let AuthService = class AuthService {
         if (!user.emailVerified) {
             throw new common_1.BadRequestException('Please verify your email before logging in');
         }
+        if (dto.fcmToken?.trim()) {
+            const tokens = user.fcmTokens ?? [];
+            user.fcmTokens = upsertFcmToken(tokens, dto.fcmToken.trim(), dto.appId?.trim(), dto.deviceId?.trim());
+            await user.save();
+        }
         return {
             success: true,
             message: 'Login successful',
@@ -157,6 +172,16 @@ let AuthService = class AuthService {
             name: u.name ?? '',
             email: u.email ?? '',
         }));
+    }
+    async registerFcm(userId, dto) {
+        const user = await this.userModel.findOne({ id: userId }).exec();
+        if (!user) {
+            throw new common_1.BadRequestException('User not found');
+        }
+        const tokens = user.fcmTokens ?? [];
+        user.fcmTokens = upsertFcmToken(tokens, dto.fcmToken.trim(), dto.appId?.trim(), dto.deviceId?.trim());
+        await user.save();
+        return { success: true, message: 'FCM token registered' };
     }
 };
 exports.AuthService = AuthService;

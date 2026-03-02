@@ -9,7 +9,7 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.LoginResponseDto = exports.LoginDto = exports.VerifyEmailResponseDto = exports.UserResponseDto = exports.VerifyEmailDto = exports.SignupResponseDto = exports.SignupDto = void 0;
+exports.RegisterFcmDto = exports.LoginResponseDto = exports.LoginDto = exports.VerifyEmailResponseDto = exports.UserResponseDto = exports.VerifyEmailDto = exports.SignupResponseDto = exports.SignupDto = void 0;
 const swagger_1 = require("@nestjs/swagger");
 const class_validator_1 = require("class-validator");
 class SignupDto {
@@ -18,6 +18,9 @@ class SignupDto {
     name;
     role;
     departmentId;
+    fcmToken;
+    appId;
+    deviceId;
 }
 exports.SignupDto = SignupDto;
 __decorate([
@@ -53,6 +56,27 @@ __decorate([
     (0, class_validator_1.IsString)(),
     __metadata("design:type", String)
 ], SignupDto.prototype, "departmentId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'FCM token for push notifications (this device)' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(500),
+    __metadata("design:type", String)
+], SignupDto.prototype, "fcmToken", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'App identifier (e.g. task_app_android)' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], SignupDto.prototype, "appId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Device identifier for this device' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(200),
+    __metadata("design:type", String)
+], SignupDto.prototype, "deviceId", void 0);
 class SignupResponseDto {
     id;
     email;
@@ -169,6 +193,9 @@ __decorate([
 class LoginDto {
     email;
     password;
+    fcmToken;
+    appId;
+    deviceId;
 }
 exports.LoginDto = LoginDto;
 __decorate([
@@ -185,6 +212,27 @@ __decorate([
     (0, class_validator_1.MaxLength)(100),
     __metadata("design:type", String)
 ], LoginDto.prototype, "password", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'FCM token for push notifications (this device)' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(500),
+    __metadata("design:type", String)
+], LoginDto.prototype, "fcmToken", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'App identifier (e.g. task_app_android)' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], LoginDto.prototype, "appId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Device identifier for this device' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(200),
+    __metadata("design:type", String)
+], LoginDto.prototype, "deviceId", void 0);
 class LoginResponseDto {
     success;
     message;
@@ -208,4 +256,31 @@ __decorate([
     (0, swagger_1.ApiProperty)({ description: 'JWT auth token for authenticated requests' }),
     __metadata("design:type", String)
 ], LoginResponseDto.prototype, "authToken", void 0);
+class RegisterFcmDto {
+    fcmToken;
+    appId;
+    deviceId;
+}
+exports.RegisterFcmDto = RegisterFcmDto;
+__decorate([
+    (0, swagger_1.ApiProperty)({ description: 'FCM device token' }),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.IsNotEmpty)(),
+    (0, class_validator_1.MaxLength)(500),
+    __metadata("design:type", String)
+], RegisterFcmDto.prototype, "fcmToken", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'App identifier (e.g. task_app_android)' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(100),
+    __metadata("design:type", String)
+], RegisterFcmDto.prototype, "appId", void 0);
+__decorate([
+    (0, swagger_1.ApiPropertyOptional)({ description: 'Device identifier' }),
+    (0, class_validator_1.IsOptional)(),
+    (0, class_validator_1.IsString)(),
+    (0, class_validator_1.MaxLength)(200),
+    __metadata("design:type", String)
+], RegisterFcmDto.prototype, "deviceId", void 0);
 //# sourceMappingURL=signup.dto.js.map

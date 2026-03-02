@@ -24,6 +24,7 @@ let User = class User {
     otpExpiresAt;
     createdAt;
     updatedAt;
+    fcmTokens;
 };
 exports.User = User;
 __decorate([
@@ -70,6 +71,21 @@ __decorate([
     (0, mongoose_1.Prop)({ type: Date, default: Date.now }),
     __metadata("design:type", Date)
 ], User.prototype, "updatedAt", void 0);
+__decorate([
+    (0, mongoose_1.Prop)({
+        type: [
+            {
+                token: String,
+                appId: { type: String, default: null },
+                deviceId: { type: String, default: null },
+                updatedAt: { type: Date, default: Date.now },
+            },
+        ],
+        default: [],
+        _id: false,
+    }),
+    __metadata("design:type", Array)
+], User.prototype, "fcmTokens", void 0);
 exports.User = User = __decorate([
     (0, mongoose_1.Schema)()
 ], User);

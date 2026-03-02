@@ -38,6 +38,21 @@ export class User {
 
   @Prop({ type: Date, default: Date.now })
   updatedAt: Date;
+
+  /** FCM tokens for push (multiple devices / multiple apps per user) */
+  @Prop({
+    type: [
+      {
+        token: String,
+        appId: { type: String, default: null },
+        deviceId: { type: String, default: null },
+        updatedAt: { type: Date, default: Date.now },
+      },
+    ],
+    default: [],
+    _id: false,
+  })
+  fcmTokens: { token: string; appId?: string | null; deviceId?: string | null; updatedAt: Date }[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

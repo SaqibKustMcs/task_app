@@ -11,6 +11,7 @@ import {
   LoginDto,
   LoginResponseDto,
   UserResponseDto,
+  RegisterFcmDto,
 } from './dto/signup.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
@@ -67,5 +68,17 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   getUsers() {
     return this.authService.getUsers();
+  }
+
+  @Post('fcm')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Register or refresh FCM token (multiple devices/apps)' })
+  @ApiBody({ type: RegisterFcmDto })
+  @ApiResponse({ status: 200, description: 'FCM token registered' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiResponse({ status: 400, description: 'Validation error' })
+  registerFcm(@Request() req: AuthRequest, @Body() dto: RegisterFcmDto) {
+    return this.authService.registerFcm(req.user.id, dto);
   }
 }

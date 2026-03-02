@@ -29,6 +29,24 @@ export class SignupDto {
   @IsOptional()
   @IsString()
   departmentId?: string;
+
+  @ApiPropertyOptional({ description: 'FCM token for push notifications (this device)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  fcmToken?: string;
+
+  @ApiPropertyOptional({ description: 'App identifier (e.g. task_app_android)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  appId?: string;
+
+  @ApiPropertyOptional({ description: 'Device identifier for this device' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  deviceId?: string;
 }
 
 export class SignupResponseDto {
@@ -100,6 +118,24 @@ export class LoginDto {
   @MinLength(6)
   @MaxLength(100)
   password: string;
+
+  @ApiPropertyOptional({ description: 'FCM token for push notifications (this device)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  fcmToken?: string;
+
+  @ApiPropertyOptional({ description: 'App identifier (e.g. task_app_android)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  appId?: string;
+
+  @ApiPropertyOptional({ description: 'Device identifier for this device' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  deviceId?: string;
 }
 
 export class LoginResponseDto {
@@ -111,4 +147,24 @@ export class LoginResponseDto {
   user: UserResponseDto;
   @ApiProperty({ description: 'JWT auth token for authenticated requests' })
   authToken: string;
+}
+
+export class RegisterFcmDto {
+  @ApiProperty({ description: 'FCM device token' })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(500)
+  fcmToken: string;
+
+  @ApiPropertyOptional({ description: 'App identifier (e.g. task_app_android)' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  appId?: string;
+
+  @ApiPropertyOptional({ description: 'Device identifier' })
+  @IsOptional()
+  @IsString()
+  @MaxLength(200)
+  deviceId?: string;
 }
