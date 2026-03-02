@@ -46,10 +46,6 @@ try {
     `NETWORK_IP=${newIp}`
   );
   envContent = envContent.replace(
-    /WEBSOCKET_NETWORK_IP=.*/g,
-    `WEBSOCKET_NETWORK_IP=${newIp}`
-  );
-  envContent = envContent.replace(
     /CORS_ORIGIN=http:\/\/[^:]+:(\d+)/g,
     `CORS_ORIGIN=http://${newIp}:$1`
   );
@@ -88,12 +84,6 @@ try {
     `static const String baseUrl = 'http://${newIp}:3101'`
   );
   
-  // Update wsUrl
-  dartContent = dartContent.replace(
-    /static const String wsUrl = 'ws:\/\/[^']+'/g,
-    `static const String wsUrl = 'ws://${newIp}:3101'`
-  );
-  
   fs.writeFileSync(apiConstantsPath, dartContent, 'utf8');
   console.log('✅ Frontend api_constants.dart updated');
 } catch (error) {
@@ -104,7 +94,6 @@ console.log('\n=====================================');
 console.log('✅ Network IP update complete!\n');
 console.log('📍 New URLs:');
 console.log(`   REST API:   http://${newIp}:3101`);
-console.log(`   WebSocket:  ws://${newIp}:3101`);
 console.log(`   Swagger:    http://${newIp}:3101/swagger\n`);
 console.log('🔄 Next steps:');
 console.log('   1. Restart backend: npm run start:dev');

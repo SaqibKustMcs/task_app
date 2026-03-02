@@ -20,11 +20,6 @@ PORT=3101
 HOST=0.0.0.0
 NETWORK_IP=192.168.18.32  # 👈 CHANGE HERE
 
-# WebSocket Configuration
-WEBSOCKET_PORT=3101
-WEBSOCKET_HOST=0.0.0.0
-WEBSOCKET_NETWORK_IP=192.168.18.32  # 👈 Keep same as NETWORK_IP
-
 # CORS Configuration
 CORS_ORIGIN=http://192.168.18.32:3101,http://localhost:3101
 
@@ -44,7 +39,6 @@ Update to match your `.env` NETWORK_IP:
 ```dart
 class ApiConstants {
   static const String baseUrl = 'http://192.168.18.32:3101';  // 👈 Match NETWORK_IP
-  static const String wsUrl = 'ws://192.168.18.32:3101';      // 👈 Match NETWORK_IP
 }
 ```
 
@@ -117,12 +111,10 @@ PORT=3101
 **Frontend (api_constants.dart):**
 ```dart
 baseUrl = 'http://192.168.18.32:3101'
-wsUrl = 'ws://192.168.18.32:3101'
 ```
 
 **Your API URLs:**
 - 📍 REST API: `http://192.168.18.32:3101`
-- 🔌 WebSocket: `ws://192.168.18.32:3101`
 - 📚 Swagger: `http://192.168.18.32:3101/swagger`
 
 ---
