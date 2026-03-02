@@ -83,5 +83,4 @@ exports.UserSchema.set('toJSON', {
         delete ret.password;
     },
 });
-exports.UserSchema.index({ email: 1 }, { unique: true });
 //# sourceMappingURL=user.schema.js.map

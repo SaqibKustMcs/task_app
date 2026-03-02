@@ -51,5 +51,3 @@ UserSchema.set('toJSON', {
     delete (ret as unknown as Record<string, unknown>).password;
   },
 });
-
-UserSchema.index({ email: 1 }, { unique: true });
