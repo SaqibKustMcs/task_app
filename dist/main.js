@@ -28,7 +28,7 @@ async function bootstrap() {
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'x-user-id'],
     });
-    const port = process.env.PORT || 3000;
+    const port = process.env.PORT || 51243;
     const host = process.env.HOST || '0.0.0.0';
     await app.listen(port, host);
     console.log(`\nPost API running at http://localhost:${port}`);
