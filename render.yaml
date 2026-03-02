@@ -1,0 +1,22 @@
+# Render.com web service for NestJS backend
+# https://render.com/docs/blueprint-spec
+services:
+  - type: web
+    name: task-app-backend
+    runtime: node
+    region: oregon
+
+    # Build: install deps and compile (runs in build environment)
+    buildCommand: npm ci && npm run build
+    # Start: run pre-built JS only (low memory, opens PORT quickly)
+    startCommand: npm run start:prod
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: CORS_ORIGIN
+        value: "*"
