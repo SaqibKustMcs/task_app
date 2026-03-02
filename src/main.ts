@@ -4,6 +4,12 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  // Fail fast on Render/Railway if MONGO_URI is not set (avoids cryptic exit 134)
+  if (!process.env.MONGO_URI?.trim()) {
+    console.error('FATAL: MONGO_URI environment variable is not set.');
+    process.exit(1);
+  }
+
   const app = await NestFactory.create(AppModule);
 
   // Global validation
@@ -39,13 +45,12 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'x-user-id'],
   });
 
-  // ✅ Render requires dynamic PORT and binding to 0.0.0.0
-  const port = process.env.PORT || 3000;
+  // Render/Railway: use PORT from env and bind to 0.0.0.0
+  const port = process.env.PORT || 3101;
   await app.listen(port, '0.0.0.0');
 
   console.log(`Server running on port ${port}`);
-  console.log(`Swagger UI available at /swagger`);
-  console.log('Mongo URI:', process.env.MONGO_URI || '');
+  console.log(`Swagger UI: /swagger`);
 }
 
 bootstrap();

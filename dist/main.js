@@ -5,6 +5,10 @@ const core_1 = require("@nestjs/core");
 const swagger_1 = require("@nestjs/swagger");
 const app_module_1 = require("./app.module");
 async function bootstrap() {
+    if (!process.env.MONGO_URI?.trim()) {
+        console.error('FATAL: MONGO_URI environment variable is not set.');
+        process.exit(1);
+    }
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.useGlobalPipes(new common_1.ValidationPipe({
         transform: true,
@@ -28,11 +32,10 @@ async function bootstrap() {
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'x-user-id'],
     });
-    const port = process.env.PORT || 3000;
+    const port = process.env.PORT || 3101;
     await app.listen(port, '0.0.0.0');
     console.log(`Server running on port ${port}`);
-    console.log(`Swagger UI available at /swagger`);
-    console.log('Mongo URI:', process.env.MONGO_URI || '');
+    console.log(`Swagger UI: /swagger`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map
