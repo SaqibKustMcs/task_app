@@ -5,6 +5,8 @@ import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  // Global validation
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -14,6 +16,7 @@ async function bootstrap() {
     }),
   );
 
+  // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Task APP')
     .setDescription('Task App Devbay APIs')
@@ -28,6 +31,7 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('swagger', app, document);
 
+  // CORS setup
   app.enableCors({
     origin: process.env.CORS_ORIGIN?.split(',') || ['*'],
     credentials: true,
@@ -35,16 +39,13 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'x-user-id'],
   });
 
-  const port = process.env.PORT || 51243;
-  const host = process.env.HOST || '0.0.0.0';
-  await app.listen(port, host);
+  // ✅ Render requires dynamic PORT and binding to 0.0.0.0
+  const port = process.env.PORT || 3000;
+  await app.listen(port, '0.0.0.0');
 
-  console.log(`\nPost API running at http://localhost:${port}`);
-  console.log(`           (LAN) at http://192.168.102.138:${port}`);
-  console.log(`Swagger UI: http://localhost:${port}/swagger\n`);
-  console.log(
-  '\nMongo URI> changes: ', 
-  process.env.MONGO_URI || '',
-);
+  console.log(`Server running on port ${port}`);
+  console.log(`Swagger UI available at /swagger`);
+  console.log('Mongo URI:', process.env.MONGO_URI || '');
 }
+
 bootstrap();
