@@ -29,8 +29,10 @@ async function bootstrap() {
         allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'x-user-id'],
     });
     const port = process.env.PORT || 3101;
-    await app.listen(port);
+    const host = process.env.HOST || '0.0.0.0';
+    await app.listen(port, host);
     console.log(`\nPost API running at http://localhost:${port}`);
+    console.log(`           (LAN) at http://192.168.102.138:${port}`);
     console.log(`Swagger UI: http://localhost:${port}/swagger\n`);
     console.log('\nMongo URI> changes: ', process.env.MONGO_URI || '');
 }
