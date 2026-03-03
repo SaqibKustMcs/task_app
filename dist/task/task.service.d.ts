@@ -2,10 +2,12 @@ import { Model } from 'mongoose';
 import { CreateTaskDto, TaskQueryDto, TaskResponseDto, UpdateTaskDto, UpdateTaskStatusDto } from './dto/task.dto';
 import { Task as TaskInterface } from '../interface/task/task.interface';
 import { UserDocument } from '../schema/user/user.schema';
+import { NotificationService } from '../notification/notification.service';
 export declare class TaskService {
     private taskModel;
     private userModel;
-    constructor(taskModel: Model<TaskInterface>, userModel: Model<UserDocument>);
+    private readonly notificationService;
+    constructor(taskModel: Model<TaskInterface>, userModel: Model<UserDocument>, notificationService: NotificationService);
     private toResponse;
     createTask(dto: CreateTaskDto, userId?: string, userRole?: string): Promise<{
         success: boolean;
@@ -44,7 +46,7 @@ export declare class TaskService {
         message: string;
         data: TaskResponseDto;
     }>;
-    updateTask(taskId: string, dto: UpdateTaskDto): Promise<{
+    updateTask(taskId: string, dto: UpdateTaskDto, currentUserId?: string): Promise<{
         success: boolean;
         message: string;
         data: TaskResponseDto;

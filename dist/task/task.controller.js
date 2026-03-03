@@ -43,8 +43,8 @@ let TaskController = class TaskController {
     updateTaskStatus(taskId, dto, user) {
         return this.taskService.updateTaskStatus(taskId, dto, user?.id ?? '');
     }
-    updateTask(taskId, dto) {
-        return this.taskService.updateTask(taskId, dto);
+    updateTask(taskId, dto, user) {
+        return this.taskService.updateTask(taskId, dto, user?.id);
     }
     deleteTask(taskId, user) {
         return this.taskService.deleteTask(taskId, user?.id ?? '');
@@ -120,8 +120,9 @@ __decorate([
     (0, swagger_1.ApiResponse)({ status: 404, description: 'Task not found' }),
     __param(0, (0, common_1.Param)('id')),
     __param(1, (0, common_1.Body)()),
+    __param(2, (0, user_decorator_1.User)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String, dto_1.UpdateTaskDto]),
+    __metadata("design:paramtypes", [String, dto_1.UpdateTaskDto, Object]),
     __metadata("design:returntype", void 0)
 ], TaskController.prototype, "updateTask", null);
 __decorate([

@@ -6,31 +6,30 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TaskModule = void 0;
+exports.NotificationModule = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const auth_module_1 = require("../auth/auth.module");
-const notification_module_1 = require("../notification/notification.module");
 const user_schema_1 = require("../schema/user/user.schema");
-const task_schema_1 = require("../schema/task/task.schema");
-const task_controller_1 = require("./task.controller");
-const task_service_1 = require("./task.service");
-let TaskModule = class TaskModule {
+const notification_schema_1 = require("../schema/notification/notification.schema");
+const firebase_service_1 = require("./firebase.service");
+const notification_service_1 = require("./notification.service");
+const notification_controller_1 = require("./notification.controller");
+let NotificationModule = class NotificationModule {
 };
-exports.TaskModule = TaskModule;
-exports.TaskModule = TaskModule = __decorate([
+exports.NotificationModule = NotificationModule;
+exports.NotificationModule = NotificationModule = __decorate([
     (0, common_1.Module)({
         imports: [
             auth_module_1.AuthModule,
-            notification_module_1.NotificationModule,
             mongoose_1.MongooseModule.forFeature([
-                { name: task_schema_1.Task.name, schema: task_schema_1.TaskSchema },
+                { name: notification_schema_1.Notification.name, schema: notification_schema_1.NotificationSchema },
                 { name: user_schema_1.User.name, schema: user_schema_1.UserSchema },
             ]),
         ],
-        controllers: [task_controller_1.TaskController],
-        providers: [task_service_1.TaskService],
-        exports: [task_service_1.TaskService],
+        controllers: [notification_controller_1.NotificationController],
+        providers: [firebase_service_1.FirebaseService, notification_service_1.NotificationService],
+        exports: [notification_service_1.NotificationService],
     })
-], TaskModule);
-//# sourceMappingURL=task.module.js.map
+], NotificationModule);
+//# sourceMappingURL=notification.module.js.map

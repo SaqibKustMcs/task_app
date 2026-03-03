@@ -26,7 +26,7 @@ type TaskServiceShape = {
   getAllTasks(query: TaskQueryDto, rawIsCompleted?: string, rawUnassigned?: string): Promise<{ success: boolean; message: string; data: { tasks: TaskResponseDto[]; total: number; offset: number; limit: number } }>;
   getDashboardStats(departmentId?: string): Promise<{ success: boolean; message: string; data: { byStatus: { pending: number; in_progress: number; completed: number }; total: number } }>;
   getTaskById(taskId: string): Promise<{ success: boolean; message: string; data: TaskResponseDto }>;
-  updateTask(taskId: string, dto: UpdateTaskDto): Promise<{ success: boolean; message: string; data: TaskResponseDto }>;
+  updateTask(taskId: string, dto: UpdateTaskDto, userId?: string): Promise<{ success: boolean; message: string; data: TaskResponseDto }>;
   updateTaskStatus(taskId: string, dto: UpdateTaskStatusDto, userId: string): Promise<{ success: boolean; message: string; data: TaskResponseDto }>;
   deleteTask(taskId: string, userId: string): Promise<{ success: boolean; message: string }>;
 };
@@ -104,8 +104,8 @@ export class TaskController {
   @ApiBody({ type: UpdateTaskDto })
   @ApiResponse({ status: 200, description: 'Task updated successfully' })
   @ApiResponse({ status: 404, description: 'Task not found' })
-  updateTask(@Param('id') taskId: string, @Body() dto: UpdateTaskDto) {
-    return (this.taskService as TaskServiceShape).updateTask(taskId, dto);
+  updateTask(@Param('id') taskId: string, @Body() dto: UpdateTaskDto, @User() user?: RequestUser) {
+    return (this.taskService as TaskServiceShape).updateTask(taskId, dto, user?.id);
   }
 
   @Delete(':id')

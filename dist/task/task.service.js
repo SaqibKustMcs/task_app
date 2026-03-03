@@ -19,12 +19,15 @@ const mongoose_2 = require("mongoose");
 const task_schema_1 = require("../schema/task/task.schema");
 const user_schema_1 = require("../schema/user/user.schema");
 const enums_1 = require("../enums");
+const notification_service_1 = require("../notification/notification.service");
 let TaskService = class TaskService {
     taskModel;
     userModel;
-    constructor(taskModel, userModel) {
+    notificationService;
+    constructor(taskModel, userModel, notificationService) {
         this.taskModel = taskModel;
         this.userModel = userModel;
+        this.notificationService = notificationService;
     }
     toResponse(task) {
         const status = task.status ?? (task.isCompleted ? 'completed' : 'pending');
@@ -88,6 +91,17 @@ let TaskService = class TaskService {
         }
         const doc = await new this.taskModel(taskData).save();
         const data = this.toResponse(doc.toObject?.() ?? doc);
+        const assigneeId = taskData.assigneeId ?? taskData.assignedTo;
+        if (assigneeId && userRole === 'manager' && userId) {
+            const manager = await this.userModel.findOne({ id: userId }).lean().exec();
+            this.notificationService.notifyTaskAssigned({
+                assigneeUserId: assigneeId,
+                taskId: doc.id,
+                taskTitle: taskData.title,
+                assignedByUserId: userId,
+                assignedByName: manager?.name ?? undefined,
+            }).catch(() => { });
+        }
         return { success: true, message: 'Task created successfully', data };
     }
     async updateTaskStatus(taskId, dto, userId) {
@@ -199,7 +213,7 @@ let TaskService = class TaskService {
         const data = this.toResponse(doc.toObject?.() ?? doc);
         return { success: true, message: 'Task retrieved successfully', data };
     }
-    async updateTask(taskId, dto) {
+    async updateTask(taskId, dto, currentUserId) {
         if (!taskId || String(taskId).trim() === '') {
             throw new common_1.BadRequestException('Task id is required');
         }
@@ -236,11 +250,28 @@ let TaskService = class TaskService {
             const data = this.toResponse(doc.toObject?.() ?? doc);
             return { success: true, message: 'Task unchanged', data };
         }
+        const previousAssignee = doc.assigneeId ?? doc.assignedTo ?? null;
+        const newAssignee = update.assigneeId !== undefined
+            ? (update.assigneeId?.trim() === '' ? null : update.assigneeId?.trim() ?? null)
+            : previousAssignee;
         update.updatedAt = new Date();
         const updated = await this.taskModel
             .findOneAndUpdate({ id: taskId }, { $set: update }, { new: true })
             .exec();
         const data = this.toResponse(updated?.toObject?.() ?? updated);
+        if (newAssignee && newAssignee !== previousAssignee) {
+            const manager = await this.userModel
+                .findOne({ id: currentUserId ?? doc.userId })
+                .lean()
+                .exec();
+            this.notificationService.notifyTaskAssigned({
+                assigneeUserId: newAssignee,
+                taskId,
+                taskTitle: updated?.title ?? '',
+                assignedByUserId: currentUserId ?? doc.userId ?? null,
+                assignedByName: manager?.name ?? undefined,
+            }).catch(() => { });
+        }
         return { success: true, message: 'Task updated successfully', data };
     }
     async deleteTask(taskId, userId) {
@@ -269,6 +300,7 @@ exports.TaskService = TaskService = __decorate([
     __param(0, (0, mongoose_1.InjectModel)(task_schema_1.Task.name)),
     __param(1, (0, mongoose_1.InjectModel)(user_schema_1.User.name)),
     __metadata("design:paramtypes", [mongoose_2.Model,
-        mongoose_2.Model])
+        mongoose_2.Model,
+        notification_service_1.NotificationService])
 ], TaskService);
 //# sourceMappingURL=task.service.js.map

@@ -34,7 +34,7 @@ type TaskServiceShape = {
         message: string;
         data: TaskResponseDto;
     }>;
-    updateTask(taskId: string, dto: UpdateTaskDto): Promise<{
+    updateTask(taskId: string, dto: UpdateTaskDto, userId?: string): Promise<{
         success: boolean;
         message: string;
         data: TaskResponseDto;
@@ -89,7 +89,7 @@ export declare class TaskController {
         message: string;
         data: TaskResponseDto;
     }>;
-    updateTask(taskId: string, dto: UpdateTaskDto): Promise<{
+    updateTask(taskId: string, dto: UpdateTaskDto, user?: RequestUser): Promise<{
         success: boolean;
         message: string;
         data: TaskResponseDto;

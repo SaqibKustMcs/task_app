@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
 import { DepartmentModule } from './department/department.module';
 import { TaskModule } from './task/task.module';
+import { NotificationModule } from './notification/notification.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { TaskModule } from './task/task.module';
     AuthModule,
     DepartmentModule,
     TaskModule,
+    NotificationModule,
   ],
 })
 export class AppModule {}

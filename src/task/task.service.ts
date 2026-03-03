@@ -6,12 +6,14 @@ import { Task } from '../schema/task/task.schema';
 import { Task as TaskInterface } from '../interface/task/task.interface';
 import { User, UserDocument } from '../schema/user/user.schema';
 import { TaskStatus } from '../enums';
+import { NotificationService } from '../notification/notification.service';
 
 @Injectable()
 export class TaskService {
   constructor(
     @InjectModel(Task.name) private taskModel: Model<TaskInterface>,
     @InjectModel(User.name) private userModel: Model<UserDocument>,
+    private readonly notificationService: NotificationService,
   ) {}
 
   private toResponse(task: any): TaskResponseDto {
@@ -78,6 +80,17 @@ export class TaskService {
 
     const doc = await new this.taskModel(taskData).save();
     const data = this.toResponse(doc.toObject?.() ?? doc);
+    const assigneeId = taskData.assigneeId ?? taskData.assignedTo;
+    if (assigneeId && userRole === 'manager' && userId) {
+      const manager = await this.userModel.findOne({ id: userId }).lean().exec();
+      this.notificationService.notifyTaskAssigned({
+        assigneeUserId: assigneeId,
+        taskId: (doc as any).id,
+        taskTitle: taskData.title,
+        assignedByUserId: userId,
+        assignedByName: (manager as any)?.name ?? undefined,
+      }).catch(() => {});
+    }
     return { success: true, message: 'Task created successfully', data };
   }
 
@@ -211,6 +224,7 @@ export class TaskService {
   async updateTask(
     taskId: string,
     dto: UpdateTaskDto,
+    currentUserId?: string,
   ): Promise<{ success: boolean; message: string; data: TaskResponseDto }> {
     if (!taskId || String(taskId).trim() === '') {
       throw new BadRequestException('Task id is required');
@@ -239,6 +253,10 @@ export class TaskService {
       const data = this.toResponse((doc as any).toObject?.() ?? doc);
       return { success: true, message: 'Task unchanged', data };
     }
+    const previousAssignee = (doc as any).assigneeId ?? (doc as any).assignedTo ?? null;
+    const newAssignee = update.assigneeId !== undefined
+      ? (update.assigneeId?.trim() === '' ? null : update.assigneeId?.trim() ?? null)
+      : previousAssignee;
     update.updatedAt = new Date();
     const updated = await this.taskModel
       .findOneAndUpdate(
@@ -248,6 +266,19 @@ export class TaskService {
       )
       .exec();
     const data = this.toResponse((updated as any)?.toObject?.() ?? updated);
+    if (newAssignee && newAssignee !== previousAssignee) {
+      const manager = await this.userModel
+        .findOne({ id: currentUserId ?? (doc as any).userId })
+        .lean()
+        .exec();
+      this.notificationService.notifyTaskAssigned({
+        assigneeUserId: newAssignee,
+        taskId,
+        taskTitle: (updated as any)?.title ?? '',
+        assignedByUserId: currentUserId ?? (doc as any).userId ?? null,
+        assignedByName: (manager as any)?.name ?? undefined,
+      }).catch(() => {});
+    }
     return { success: true, message: 'Task updated successfully', data };
   }
 
