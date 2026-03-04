@@ -19,6 +19,15 @@ const mongoose_2 = require("mongoose");
 const user_schema_1 = require("../schema/user/user.schema");
 const notification_schema_1 = require("../schema/notification/notification.schema");
 const firebase_service_1 = require("./firebase.service");
+function getTokenString(t) {
+    if (!t)
+        return null;
+    const token = typeof t === 'string' ? t : (t.token ?? t.get?.('token'));
+    if (typeof token !== 'string')
+        return null;
+    const s = token.trim();
+    return s.length > 0 ? s : null;
+}
 let NotificationService = class NotificationService {
     notificationModel;
     userModel;
@@ -43,15 +52,37 @@ let NotificationService = class NotificationService {
             assignedByUserId: assignedByUserId ?? null,
             read: false,
         });
-        const user = await this.userModel.findOne({ id: assigneeUserId }).lean().exec();
-        const tokens = user?.fcmTokens?.map((t) => t.token) ?? [];
-        const validTokens = tokens.filter((t) => t && t.trim().length > 0);
-        if (validTokens.length > 0) {
-            await this.firebaseService.sendToTokens(validTokens, {
-                title,
-                body,
-                data: { type: 'task_assigned', taskId, notificationId: doc.id },
-            });
+        const user = await this.userModel.findOne({ id: assigneeUserId }).exec();
+        if (!user)
+            return;
+        const rawList = user.fcmTokens ?? [];
+        const validTokens = [];
+        rawList.forEach((t) => {
+            const s = getTokenString(t);
+            if (s)
+                validTokens.push(s);
+        });
+        if (validTokens.length === 0)
+            return;
+        const result = await this.firebaseService.sendToTokens(validTokens, {
+            title,
+            body,
+            data: { type: 'task_assigned', taskId, notificationId: doc.id },
+        });
+        if (result.failureCount > 0 && result.failedTokenIndices.length > 0) {
+            const toRemove = new Set(result.failedTokenIndices.map((i) => validTokens[i]));
+            const updatedList = rawList
+                .filter((t) => {
+                const s = getTokenString(t);
+                return s && !toRemove.has(s);
+            })
+                .map((t) => ({
+                token: getTokenString(t),
+                appId: t.appId ?? t.get?.('appId') ?? null,
+                deviceId: t.deviceId ?? t.get?.('deviceId') ?? null,
+                updatedAt: t.updatedAt ?? new Date(),
+            }));
+            await this.userModel.updateOne({ id: assigneeUserId }, { $set: { fcmTokens: updatedList } }).exec();
         }
     }
     async listForUser(userId, limit = 50) {

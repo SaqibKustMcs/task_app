@@ -100,7 +100,9 @@ let TaskService = class TaskService {
                 taskTitle: taskData.title,
                 assignedByUserId: userId,
                 assignedByName: manager?.name ?? undefined,
-            }).catch(() => { });
+            }).catch((e) => {
+                console.warn('[Notifications] notifyTaskAssigned failed (createTask):', e);
+            });
         }
         return { success: true, message: 'Task created successfully', data };
     }
@@ -270,7 +272,9 @@ let TaskService = class TaskService {
                 taskTitle: updated?.title ?? '',
                 assignedByUserId: currentUserId ?? doc.userId ?? null,
                 assignedByName: manager?.name ?? undefined,
-            }).catch(() => { });
+            }).catch((e) => {
+                console.warn('[Notifications] notifyTaskAssigned failed (updateTask):', e);
+            });
         }
         return { success: true, message: 'Task updated successfully', data };
     }

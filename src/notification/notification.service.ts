@@ -6,6 +6,15 @@ import { Notification, NotificationDocument } from '../schema/notification/notif
 import { FirebaseService } from './firebase.service';
 import { NotificationResponseDto } from './dto/notification.dto';
 
+/** Extract FCM token string from a stored token object (Mongoose may use .get or plain .token). */
+function getTokenString(t: any): string | null {
+  if (!t) return null;
+  const token = typeof t === 'string' ? t : (t.token ?? t.get?.('token'));
+  if (typeof token !== 'string') return null;
+  const s = token.trim();
+  return s.length > 0 ? s : null;
+}
+
 @Injectable()
 export class NotificationService {
   constructor(
@@ -38,15 +47,37 @@ export class NotificationService {
       read: false,
     });
 
-    const user = await this.userModel.findOne({ id: assigneeUserId }).lean().exec();
-    const tokens: string[] = (user as any)?.fcmTokens?.map((t: { token: string }) => t.token) ?? [];
-    const validTokens = tokens.filter((t: string) => t && t.trim().length > 0);
-    if (validTokens.length > 0) {
-      await this.firebaseService.sendToTokens(validTokens, {
-        title,
-        body,
-        data: { type: 'task_assigned', taskId, notificationId: doc.id },
-      });
+    const user = await this.userModel.findOne({ id: assigneeUserId }).exec();
+    if (!user) return;
+    const rawList = (user as any).fcmTokens ?? [];
+    const validTokens: string[] = [];
+    rawList.forEach((t: any) => {
+      const s = getTokenString(t);
+      if (s) validTokens.push(s);
+    });
+
+    if (validTokens.length === 0) return;
+
+    const result = await this.firebaseService.sendToTokens(validTokens, {
+      title,
+      body,
+      data: { type: 'task_assigned', taskId, notificationId: doc.id },
+    });
+
+    if (result.failureCount > 0 && result.failedTokenIndices.length > 0) {
+      const toRemove = new Set(result.failedTokenIndices.map((i) => validTokens[i]));
+      const updatedList = rawList
+        .filter((t: any) => {
+          const s = getTokenString(t);
+          return s && !toRemove.has(s);
+        })
+        .map((t: any) => ({
+          token: getTokenString(t)!,
+          appId: t.appId ?? t.get?.('appId') ?? null,
+          deviceId: t.deviceId ?? t.get?.('deviceId') ?? null,
+          updatedAt: t.updatedAt ?? new Date(),
+        }));
+      await this.userModel.updateOne({ id: assigneeUserId }, { $set: { fcmTokens: updatedList } }).exec();
     }
   }
 
