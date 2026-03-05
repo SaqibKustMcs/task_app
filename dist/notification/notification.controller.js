@@ -34,6 +34,9 @@ let NotificationController = class NotificationController {
     async markRead(req, id) {
         return this.notificationService.markRead(req.user.id, id);
     }
+    async sendTestPush(req) {
+        return this.notificationService.sendTestPush(req.user.id);
+    }
 };
 exports.NotificationController = NotificationController;
 __decorate([
@@ -70,6 +73,16 @@ __decorate([
     __metadata("design:paramtypes", [Object, String]),
     __metadata("design:returntype", Promise)
 ], NotificationController.prototype, "markRead", null);
+__decorate([
+    (0, common_1.Post)('test-push'),
+    (0, swagger_1.ApiOperation)({ summary: 'Send a test push notification to current user devices' }),
+    (0, swagger_1.ApiResponse)({ status: 200, description: 'Test push attempt result' }),
+    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
+    __param(0, (0, common_1.Request)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", Promise)
+], NotificationController.prototype, "sendTestPush", null);
 exports.NotificationController = NotificationController = __decorate([
     (0, swagger_1.ApiTags)('notifications'),
     (0, common_1.Controller)('notifications'),

@@ -14,6 +14,7 @@ const auth_module_1 = require("./auth/auth.module");
 const department_module_1 = require("./department/department.module");
 const task_module_1 = require("./task/task.module");
 const notification_module_1 = require("./notification/notification.module");
+const media_upload_module_1 = require("./file-management/media-upload/media-upload.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -28,6 +29,7 @@ exports.AppModule = AppModule = __decorate([
             department_module_1.DepartmentModule,
             task_module_1.TaskModule,
             notification_module_1.NotificationModule,
+            media_upload_module_1.MediaUploadModule
         ],
     })
 ], AppModule);

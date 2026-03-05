@@ -127,4 +127,27 @@ export class NotificationService {
       .exec();
     return { success: true, count: res.modifiedCount };
   }
+
+  /** Send a test push notification to the current user's devices (no in-app notification). */
+  async sendTestPush(userId: string): Promise<{ success: boolean; sent: number; failed: number }> {
+    const user = await this.userModel.findOne({ id: userId }).exec();
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    const rawList = (user as any).fcmTokens ?? [];
+    const tokens: string[] = [];
+    rawList.forEach((t: any) => {
+      const s = getTokenString(t);
+      if (s) tokens.push(s);
+    });
+    if (tokens.length === 0) {
+      return { success: false, sent: 0, failed: 0 };
+    }
+    const result = await this.firebaseService.sendToTokens(tokens, {
+      title: 'Test push notification',
+      body: 'If you see this, FCM is wired correctly.',
+      data: { type: 'test_push' },
+    });
+    return { success: result.failureCount === 0, sent: result.successCount, failed: result.failureCount };
+  }
 }

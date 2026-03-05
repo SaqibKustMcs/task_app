@@ -123,6 +123,28 @@ let NotificationService = class NotificationService {
             .exec();
         return { success: true, count: res.modifiedCount };
     }
+    async sendTestPush(userId) {
+        const user = await this.userModel.findOne({ id: userId }).exec();
+        if (!user) {
+            throw new common_1.NotFoundException('User not found');
+        }
+        const rawList = user.fcmTokens ?? [];
+        const tokens = [];
+        rawList.forEach((t) => {
+            const s = getTokenString(t);
+            if (s)
+                tokens.push(s);
+        });
+        if (tokens.length === 0) {
+            return { success: false, sent: 0, failed: 0 };
+        }
+        const result = await this.firebaseService.sendToTokens(tokens, {
+            title: 'Test push notification',
+            body: 'If you see this, FCM is wired correctly.',
+            data: { type: 'test_push' },
+        });
+        return { success: result.failureCount === 0, sent: result.successCount, failed: result.failureCount };
+    }
 };
 exports.NotificationService = NotificationService;
 exports.NotificationService = NotificationService = __decorate([

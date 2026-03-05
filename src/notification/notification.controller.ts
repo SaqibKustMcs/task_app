@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Query, Request, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Request as ExpressRequest } from 'express';
 import { UserDocument } from '../schema/user/user.schema';
@@ -41,5 +41,13 @@ export class NotificationController {
   @ApiResponse({ status: 401, description: 'Unauthorized' })
   async markRead(@Request() req: AuthRequest, @Param('id') id: string) {
     return this.notificationService.markRead(req.user.id, id);
+  }
+
+  @Post('test-push')
+  @ApiOperation({ summary: 'Send a test push notification to current user devices' })
+  @ApiResponse({ status: 200, description: 'Test push attempt result' })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  async sendTestPush(@Request() req: AuthRequest) {
+    return this.notificationService.sendTestPush(req.user.id);
   }
 }

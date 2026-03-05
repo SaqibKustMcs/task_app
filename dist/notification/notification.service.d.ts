@@ -27,4 +27,9 @@ export declare class NotificationService {
         success: boolean;
         count: number;
     }>;
+    sendTestPush(userId: string): Promise<{
+        success: boolean;
+        sent: number;
+        failed: number;
+    }>;
 }

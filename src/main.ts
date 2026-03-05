@@ -1,7 +1,20 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import * as os from 'os';
 import { AppModule } from './app.module';
+
+function getLocalNetworkUrl(port: number): string {
+  const envIp = process.env.NETWORK_IP?.trim();
+  if (envIp) return `http://${envIp}:${port}`;
+  const ifaces = os.networkInterfaces();
+  for (const name of Object.keys(ifaces)) {
+    for (const iface of ifaces[name] || []) {
+      if (iface.family === 'IPv4' && !iface.internal) return `http://${iface.address}:${port}`;
+    }
+  }
+  return `http://localhost:${port}`;
+}
 
 async function bootstrap() {
   // Fail fast on Render/Railway if MONGO_URI is not set (avoids cryptic exit 134)
@@ -46,11 +59,12 @@ async function bootstrap() {
   });
 
   // Render/Railway: use PORT from env and bind to 0.0.0.0
-  const port = process.env.PORT || 3101;
+  const port = Number(process.env.PORT) || 3101;
   await app.listen(port, '0.0.0.0');
 
   console.log(`Server running on port ${port}`);
-  console.log(`Swagger UI: /swagger`);
+  const baseUrl = getLocalNetworkUrl(port);
+  console.log(`Swagger UI: ${baseUrl}/swagger`);
 }
 
 bootstrap();

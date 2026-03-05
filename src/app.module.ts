@@ -5,7 +5,7 @@ import { AuthModule } from './auth/auth.module';
 import { DepartmentModule } from './department/department.module';
 import { TaskModule } from './task/task.module';
 import { NotificationModule } from './notification/notification.module';
-
+import { MediaUploadModule } from './file-management/media-upload/media-upload.module';
 @Module({
   imports: [
     // Load environment variables from .env (locally) and from the platform (Railway)
@@ -18,6 +18,7 @@ import { NotificationModule } from './notification/notification.module';
     DepartmentModule,
     TaskModule,
     NotificationModule,
+    MediaUploadModule
   ],
 })
 export class AppModule {}

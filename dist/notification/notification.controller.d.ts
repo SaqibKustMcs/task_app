@@ -19,4 +19,9 @@ export declare class NotificationController {
     markRead(req: AuthRequest, id: string): Promise<{
         success: boolean;
     }>;
+    sendTestPush(req: AuthRequest): Promise<{
+        success: boolean;
+        sent: number;
+        failed: number;
+    }>;
 }
