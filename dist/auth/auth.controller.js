@@ -17,7 +17,6 @@ const common_1 = require("@nestjs/common");
 const swagger_1 = require("@nestjs/swagger");
 const auth_service_1 = require("./auth.service");
 const signup_dto_1 = require("./dto/signup.dto");
-const logout_dto_1 = require("./dto/logout.dto");
 const jwt_auth_guard_1 = require("./guards/jwt-auth.guard");
 let AuthController = class AuthController {
     authService;
@@ -41,9 +40,6 @@ let AuthController = class AuthController {
     }
     registerFcm(req, dto) {
         return this.authService.registerFcm(req.user.id, dto);
-    }
-    logout(req, dto) {
-        return this.authService.logout(req.user.id, dto);
     }
 };
 exports.AuthController = AuthController;
@@ -119,20 +115,6 @@ __decorate([
     __metadata("design:paramtypes", [Object, signup_dto_1.RegisterFcmDto]),
     __metadata("design:returntype", void 0)
 ], AuthController.prototype, "registerFcm", null);
-__decorate([
-    (0, common_1.Post)('logout'),
-    (0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard),
-    (0, swagger_1.ApiBearerAuth)('access-token'),
-    (0, swagger_1.ApiOperation)({ summary: 'Logout and clear FCM tokens for this device' }),
-    (0, swagger_1.ApiBody)({ type: logout_dto_1.LogoutDto }),
-    (0, swagger_1.ApiResponse)({ status: 200, description: 'Logged out and tokens cleared' }),
-    (0, swagger_1.ApiResponse)({ status: 401, description: 'Unauthorized' }),
-    __param(0, (0, common_1.Request)()),
-    __param(1, (0, common_1.Body)()),
-    __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object, logout_dto_1.LogoutDto]),
-    __metadata("design:returntype", void 0)
-], AuthController.prototype, "logout", null);
 exports.AuthController = AuthController = __decorate([
     (0, swagger_1.ApiTags)('auth'),
     (0, common_1.Controller)('auth'),

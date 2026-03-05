@@ -14,7 +14,6 @@ import {
   LoginResponseDto,
   RegisterFcmDto,
 } from './dto/signup.dto';
-import { LogoutDto } from './dto/logout.dto';
 
 const DEFAULT_OTP = '123456';
 const OTP_EXPIRY_MINUTES = 15;
@@ -180,22 +179,5 @@ export class AuthService {
     );
     await user.save();
     return { success: true, message: 'FCM token registered' };
-  }
-
-  /** Clear FCM tokens for a given device when user logs out from that device. */
-  async logout(userId: string, dto: LogoutDto): Promise<{ success: boolean; message: string }> {
-    const user = await this.userModel.findOne({ id: userId }).exec();
-    if (!user) {
-      throw new BadRequestException('User not found');
-    }
-    const tokens = (user as any).fcmTokens ?? [];
-    const deviceId = dto.deviceId?.trim();
-    if (!deviceId) {
-      return { success: true, message: 'No deviceId provided; no tokens cleared' };
-    }
-    const filtered = tokens.filter((t: any) => t.deviceId !== deviceId);
-    (user as any).fcmTokens = filtered;
-    await user.save();
-    return { success: true, message: 'FCM tokens cleared for device' };
   }
 }

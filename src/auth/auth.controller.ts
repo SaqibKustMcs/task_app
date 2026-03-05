@@ -13,7 +13,6 @@ import {
   UserResponseDto,
   RegisterFcmDto,
 } from './dto/signup.dto';
-import { LogoutDto } from './dto/logout.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 export type AuthRequest = ExpressRequest & { user: UserDocument };
@@ -81,16 +80,5 @@ export class AuthController {
   @ApiResponse({ status: 400, description: 'Validation error' })
   registerFcm(@Request() req: AuthRequest, @Body() dto: RegisterFcmDto) {
     return this.authService.registerFcm(req.user.id, dto);
-  }
-
-  @Post('logout')
-  @UseGuards(JwtAuthGuard)
-  @ApiBearerAuth('access-token')
-  @ApiOperation({ summary: 'Logout and clear FCM tokens for this device' })
-  @ApiBody({ type: LogoutDto })
-  @ApiResponse({ status: 200, description: 'Logged out and tokens cleared' })
-  @ApiResponse({ status: 401, description: 'Unauthorized' })
-  logout(@Request() req: AuthRequest, @Body() dto: LogoutDto) {
-    return this.authService.logout(req.user.id, dto);
   }
 }

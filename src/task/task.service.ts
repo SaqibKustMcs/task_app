@@ -83,7 +83,8 @@ export class TaskService {
     const doc = await new this.taskModel(taskData).save();
     const data = this.toResponse(doc.toObject?.() ?? doc);
     const assigneeId = taskData.assigneeId ?? taskData.assignedTo;
-    if (assigneeId && userRole === 'manager' && userId) {
+    // Only notify the assigned user; do NOT notify the manager/creator themselves.
+    if (assigneeId && userRole === 'manager' && userId && assigneeId !== userId) {
       const manager = await this.userModel.findOne({ id: userId }).lean().exec();
       this.notificationService.notifyTaskAssigned({
         assigneeUserId: assigneeId,
@@ -279,19 +280,23 @@ export class TaskService {
       .exec();
     const data = this.toResponse((updated as any)?.toObject?.() ?? updated);
     if (newAssignee && newAssignee !== previousAssignee) {
-      const manager = await this.userModel
-        .findOne({ id: currentUserId ?? (doc as any).userId })
-        .lean()
-        .exec();
-      this.notificationService.notifyTaskAssigned({
-        assigneeUserId: newAssignee,
-        taskId,
-        taskTitle: (updated as any)?.title ?? '',
-        assignedByUserId: currentUserId ?? (doc as any).userId ?? null,
-        assignedByName: (manager as any)?.name ?? undefined,
-      }).catch((e) => {
-        console.warn('[Notifications] notifyTaskAssigned failed (updateTask):', e);
-      });
+      const assignedById = currentUserId ?? (doc as any).userId ?? null;
+      // Only notify the assigned user if they are different from the manager/creator.
+      if (assignedById && newAssignee !== assignedById) {
+        const manager = await this.userModel
+          .findOne({ id: assignedById })
+          .lean()
+          .exec();
+        this.notificationService.notifyTaskAssigned({
+          assigneeUserId: newAssignee,
+          taskId,
+          taskTitle: (updated as any)?.title ?? '',
+          assignedByUserId: assignedById,
+          assignedByName: (manager as any)?.name ?? undefined,
+        }).catch((e) => {
+          console.warn('[Notifications] notifyTaskAssigned failed (updateTask):', e);
+        });
+      }
     }
     return { success: true, message: 'Task updated successfully', data };
   }
