@@ -183,6 +183,21 @@ let AuthService = class AuthService {
         await user.save();
         return { success: true, message: 'FCM token registered' };
     }
+    async logout(userId, dto) {
+        const user = await this.userModel.findOne({ id: userId }).exec();
+        if (!user) {
+            throw new common_1.BadRequestException('User not found');
+        }
+        const tokens = user.fcmTokens ?? [];
+        const deviceId = dto.deviceId?.trim();
+        if (!deviceId) {
+            return { success: true, message: 'No deviceId provided; no tokens cleared' };
+        }
+        const filtered = tokens.filter((t) => t.deviceId !== deviceId);
+        user.fcmTokens = filtered;
+        await user.save();
+        return { success: true, message: 'FCM tokens cleared for device' };
+    }
 };
 exports.AuthService = AuthService;
 exports.AuthService = AuthService = __decorate([
