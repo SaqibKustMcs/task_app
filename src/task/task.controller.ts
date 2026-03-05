@@ -24,7 +24,7 @@ import { RolesGuard, ROLES_KEY } from '../auth/guards/roles.guard';
 type TaskServiceShape = {
   createTask(dto: CreateTaskDto, userId?: string, userRole?: string): Promise<{ success: boolean; message: string; data: TaskResponseDto }>;
   getAllTasks(query: TaskQueryDto, rawIsCompleted?: string, rawUnassigned?: string): Promise<{ success: boolean; message: string; data: { tasks: TaskResponseDto[]; total: number; offset: number; limit: number } }>;
-  getDashboardStats(departmentId?: string): Promise<{ success: boolean; message: string; data: { byStatus: { pending: number; in_progress: number; completed: number }; total: number } }>;
+  getDashboardStats(departmentId?: string): Promise<{ success: boolean; message: string; data: { byStatus: { pending: number; assigned: number; in_progress: number; completed: number }; total: number } }>;
   getTaskById(taskId: string): Promise<{ success: boolean; message: string; data: TaskResponseDto }>;
   updateTask(taskId: string, dto: UpdateTaskDto, userId?: string): Promise<{ success: boolean; message: string; data: TaskResponseDto }>;
   updateTaskStatus(taskId: string, dto: UpdateTaskStatusDto, userId: string): Promise<{ success: boolean; message: string; data: TaskResponseDto }>;

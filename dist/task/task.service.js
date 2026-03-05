@@ -53,13 +53,15 @@ let TaskService = class TaskService {
         };
     }
     async createTask(dto, userId, userRole) {
+        const hasAssignee = (dto.assigneeId != null && dto.assigneeId.trim() !== '') ||
+            (dto.assignedTo != null && dto.assignedTo.trim() !== '');
         const taskData = {
             userId: userId ?? '',
             title: dto.title.trim(),
             dueDate: new Date(dto.dueDate),
             priority: dto.priority,
             category: dto.category?.trim() ?? '',
-            status: enums_1.TaskStatus.PENDING,
+            status: hasAssignee ? enums_1.TaskStatus.ASSIGNED : enums_1.TaskStatus.PENDING,
         };
         if (dto.description != null)
             taskData.description = dto.description;
@@ -195,6 +197,7 @@ let TaskService = class TaskService {
         const data = {
             byStatus: {
                 pending: byStatus.find((x) => x._id === 'pending')?.count ?? 0,
+                assigned: byStatus.find((x) => x._id === 'assigned')?.count ?? 0,
                 in_progress: byStatus.find((x) => x._id === 'in_progress')?.count ?? 0,
                 completed: byStatus.find((x) => x._id === 'completed')?.count ?? 0,
             },
@@ -242,8 +245,14 @@ let TaskService = class TaskService {
             update.attachmentUrl = dto.attachmentUrl;
         if (typeof dto.isCompleted === 'boolean')
             update.isCompleted = dto.isCompleted;
-        if (dto.assigneeId !== undefined)
-            update.assigneeId = dto.assigneeId?.trim() === '' ? null : dto.assigneeId?.trim() ?? null;
+        if (dto.assigneeId !== undefined) {
+            const newAssignee = dto.assigneeId?.trim() === '' ? null : dto.assigneeId?.trim() ?? null;
+            update.assigneeId = newAssignee;
+            const currentStatus = doc.status ?? 'pending';
+            if (newAssignee && currentStatus === 'pending') {
+                update.status = 'assigned';
+            }
+        }
         if (dto.status !== undefined) {
             update.status = dto.status;
             update.isCompleted = dto.status === 'completed';

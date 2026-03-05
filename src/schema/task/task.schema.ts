@@ -32,7 +32,7 @@ export class Task {
   @Prop({ type: String, default: '' })
   description: string;
 
-  @Prop({ type: String, enum: ['pending', 'in_progress', 'completed'], default: 'pending' })
+  @Prop({ type: String, enum: ['pending', 'assigned', 'in_progress', 'completed'], default: 'pending' })
   status: string;
 
   @Prop({ type: Date, required: true })

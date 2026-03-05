@@ -23,6 +23,7 @@ type TaskServiceShape = {
         data: {
             byStatus: {
                 pending: number;
+                assigned: number;
                 in_progress: number;
                 completed: number;
             };
@@ -73,6 +74,7 @@ export declare class TaskController {
         data: {
             byStatus: {
                 pending: number;
+                assigned: number;
                 in_progress: number;
                 completed: number;
             };

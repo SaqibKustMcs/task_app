@@ -66,7 +66,7 @@ __decorate([
     __metadata("design:type", String)
 ], Task.prototype, "description", void 0);
 __decorate([
-    (0, mongoose_1.Prop)({ type: String, enum: ['pending', 'in_progress', 'completed'], default: 'pending' }),
+    (0, mongoose_1.Prop)({ type: String, enum: ['pending', 'assigned', 'in_progress', 'completed'], default: 'pending' }),
     __metadata("design:type", String)
 ], Task.prototype, "status", void 0);
 __decorate([

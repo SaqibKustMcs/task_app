@@ -45,13 +45,15 @@ export class TaskService {
     userId?: string,
     userRole?: string,
   ): Promise<{ success: boolean; message: string; data: TaskResponseDto }> {
+    const hasAssignee = (dto.assigneeId != null && dto.assigneeId.trim() !== '') ||
+      (dto.assignedTo != null && dto.assignedTo.trim() !== '');
     const taskData: any = {
       userId: userId ?? '',
       title: dto.title.trim(),
       dueDate: new Date(dto.dueDate),
       priority: dto.priority,
       category: dto.category?.trim() ?? '',
-      status: TaskStatus.PENDING,
+      status: hasAssignee ? TaskStatus.ASSIGNED : TaskStatus.PENDING,
     };
     if (dto.description != null) taskData.description = dto.description;
     if (dto.reminder != null) taskData.reminder = new Date(dto.reminder);
@@ -185,7 +187,7 @@ export class TaskService {
   ): Promise<{
     success: boolean;
     message: string;
-    data: { byStatus: { pending: number; in_progress: number; completed: number }; total: number };
+    data: { byStatus: { pending: number; assigned: number; in_progress: number; completed: number }; total: number };
   }> {
     const match: any = { isDeleted: { $ne: true } };
     if (departmentId) match.departmentId = departmentId;
@@ -199,6 +201,7 @@ export class TaskService {
     const data = {
       byStatus: {
         pending: byStatus.find((x) => x._id === 'pending')?.count ?? 0,
+        assigned: byStatus.find((x) => x._id === 'assigned')?.count ?? 0,
         in_progress: byStatus.find((x) => x._id === 'in_progress')?.count ?? 0,
         completed: byStatus.find((x) => x._id === 'completed')?.count ?? 0,
       },
@@ -246,7 +249,14 @@ export class TaskService {
     if (dto.reminder !== undefined) update.reminder = dto.reminder ? new Date(dto.reminder) : null;
     if (dto.attachmentUrl !== undefined) update.attachmentUrl = dto.attachmentUrl;
     if (typeof dto.isCompleted === 'boolean') update.isCompleted = dto.isCompleted;
-    if (dto.assigneeId !== undefined) update.assigneeId = dto.assigneeId?.trim() === '' ? null : dto.assigneeId?.trim() ?? null;
+    if (dto.assigneeId !== undefined) {
+      const newAssignee = dto.assigneeId?.trim() === '' ? null : dto.assigneeId?.trim() ?? null;
+      update.assigneeId = newAssignee;
+      const currentStatus = (doc as any).status ?? 'pending';
+      if (newAssignee && currentStatus === 'pending') {
+        update.status = 'assigned';
+      }
+    }
     if (dto.status !== undefined) {
       update.status = dto.status;
       update.isCompleted = dto.status === 'completed';

@@ -9,6 +9,7 @@ var UserRole;
 var TaskStatus;
 (function (TaskStatus) {
     TaskStatus["PENDING"] = "pending";
+    TaskStatus["ASSIGNED"] = "assigned";
     TaskStatus["IN_PROGRESS"] = "in_progress";
     TaskStatus["COMPLETED"] = "completed";
 })(TaskStatus || (exports.TaskStatus = TaskStatus = {}));

@@ -35,6 +35,7 @@ export declare class TaskService {
         data: {
             byStatus: {
                 pending: number;
+                assigned: number;
                 in_progress: number;
                 completed: number;
             };

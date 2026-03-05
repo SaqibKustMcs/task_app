@@ -4,6 +4,7 @@ export declare enum UserRole {
 }
 export declare enum TaskStatus {
     PENDING = "pending",
+    ASSIGNED = "assigned",
     IN_PROGRESS = "in_progress",
     COMPLETED = "completed"
 }

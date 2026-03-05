@@ -7,6 +7,7 @@ export enum UserRole {
 /** Task lifecycle status */
 export enum TaskStatus {
   PENDING = 'pending',
+  ASSIGNED = 'assigned',
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
 }
